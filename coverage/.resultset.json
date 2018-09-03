@@ -1,0 +1,14 @@
+{
+  "Unit Tests": {
+    "coverage": {
+      "/Users/isaacfalkenstine/turing/1module/Projects/battleship/lib/battleship.rb": [
+        1,
+        null,
+        1,
+        null,
+        null
+      ]
+    },
+    "timestamp": 1535827624
+  }
+}
