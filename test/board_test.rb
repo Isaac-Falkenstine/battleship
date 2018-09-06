@@ -141,4 +141,50 @@ class BoardTest < Minitest::Test
     actual = with_nil.any? { |set| set.include?(nil) }
     assert_equal true, actual
   end
+
+  def test_it_can_collect_sets
+    board = Board.new(2)
+    arr = [["A1", "A2"], ["B1", "B2"]]
+    sets = board.collect_sets(arr, 2)
+    assert_equal 4, sets.count
+  end
+
+  def test_it_can_loop_through_rows
+    board = Board.new(2)
+    arr = [["A1", "A2"], ["B1", "B2"]]
+    sets = board.loop_through_rows_for_sets(arr, 2)
+    assert_equal 2, sets.count
+  end
+
+  def test_it_can_identify_sets_by_row
+    board = Board.new(2)
+    row = ["A1", "A2"]
+    sets = board.identify_sets_by_row(row, 2, sets = [])
+    assert_equal 1, sets.count
+  end
+
+  def test_it_can_print_the_board
+    board = Board.new
+    board.initialize_positions
+    assert_equal String, board.print_board(:player_map).class
+    assert_equal String, board.print_board(:enemy_map).class
+    assert_equal false, board.print_board(:enemy_map).include?("#")
+    board.anchor_ship(["A1", "A2"])
+    assert_equal String, board.print_board(:player_map).class
+    assert_equal true, board.print_board(:player_map).include?("#")
+  end
+
+  def test_it_can_assign_board_visuals
+    board = Board.new(2)
+    board.initialize_positions
+    board.anchor_ship(["A1", "A2"])
+    board.update_player_map("A1")
+    board.update_player_map("B1")
+    player_middle = ["H", "#", "M", " "]
+    assert_equal player_middle, board.assign_board(:player_map)
+    board.update_enemy_map("A1", true)
+    board.update_enemy_map("B1", false)
+    enemy_middle = ["H", " ", "M", " "]
+    assert_equal enemy_middle, board.assign_board(:enemy_map)
+  end
 end

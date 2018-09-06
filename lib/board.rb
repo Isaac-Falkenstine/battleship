@@ -79,4 +79,71 @@ class Board
     }
     return arr.each_slice(@size).to_a
   end
+
+  def collect_sets(arr, width)
+    sets1 = loop_through_rows_for_sets(arr, width)
+    sets2 = loop_through_rows_for_sets(arr.transpose, width)
+    sets = sets1 + sets2
+    sets = sets.flatten!.each_slice(width).to_a
+  end
+
+  def loop_through_rows_for_sets(array, width)
+    array.map { |row| identify_sets_by_row(row, width) }
+  end
+
+  def identify_sets_by_row(row, width, sets = [])
+    return sets if row.size < width
+    sets << [row.first(width)]
+    head, *tail = row
+    identify_sets_by_row(tail, width, sets)
+  end
+
+
+  def print_board(map_sym)
+    arr = assign_board(map_sym).each_slice(@size).to_a
+    arr = build_rows(arr)
+    arr = arr.unshift(build_header)
+    string = build_string(arr)
+    return string
+  end
+
+
+  def assign_board(map_sym)
+    arr = create_positions
+    arr.each.with_index { |pos, i|
+        position = @positions[pos.to_sym][map_sym]
+        arr[i] = get_char(position)
+    }
+    return arr
+  end
+
+  def get_char(position)
+    return "H" if position[:hit] == true
+    return "M" if position[:shot] == true
+    return "#" if position[:ship] != nil
+    return " "
+  end
+
+  def build_rows(array)
+    rows = self.rows
+    array.map.with_index { |row, i|
+      row.unshift(rows[i])
+      row.insert(-1, "\n" )
+    }
+  end
+
+  def build_header
+    row = self.columns
+    row.unshift(".")
+    row.insert(-1, "\n")
+    return row
+  end
+
+  def build_string(arr)
+    prestring = arr.map { |row| row.join(" ")}
+    string = prestring.join
+    frame = "===========\n"
+    print "\n" + frame + string + frame
+    return string
+  end
 end
