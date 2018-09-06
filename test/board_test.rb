@@ -187,4 +187,151 @@ class BoardTest < Minitest::Test
     enemy_middle = ["H", " ", "M", " "]
     assert_equal enemy_middle, board.assign_board(:enemy_map)
   end
+  def test_it_can_get_display_characters
+    board = Board.new
+    board.initialize_positions
+
+    board.anchor_ship(["A1", "A2"])
+    board.update_player_map("A1")  
+    board.update_player_map("B1")
+
+    positions = board.positions
+    pos1 = positions[:A1][:player_map]
+    pos2 = positions[:B1][:player_map]
+    pos3 = positions[:A2][:player_map]
+
+    hit = board.get_char(pos1)
+    miss = board.get_char(pos2)
+    ship = board.get_char(pos3)
+
+    assert_equal "H", hit
+    assert_equal "M", miss
+    assert_equal "#", ship
+  end
+
+  def test_it_can_build_rows_with_headers
+    board = Board.new(2)
+    board.initialize_positions
+
+    labels = [
+      ["A1", "A2"],
+      ["B1", "B2"]
+    ]
+
+    arr = board.build_rows(labels)
+
+    expected = [
+      ["A", "A1", "A2", "\n"],
+      ["B", "B1", "B2", "\n"]
+    ]
+
+    assert_equal expected, arr
+  end
+
+  def test_it_can_build_a_header_row_for_column_names
+    board = Board.new(2)
+    board.initialize_positions
+    expected = [".", 1, 2, "\n"]
+    assert_equal expected, board.build_header
+  end
+
+  def test_it_can_build_a_string_version_of_the_board_to_print
+    board = Board.new(2)
+    board.initialize_positions
+    arr = [
+      [".", 1, 2, "\n"],
+      ["A", "A1", "A2", "\n"],
+      ["B", "B1", "B2", "\n"]
+    ]
+    string = ". 1 2 \nA A1 A2 \nB B1 B2 \n"
+    assert_equal string, board.build_string(arr)
+  end
+
+  def test_it_can_count_moves_so_far
+    board = Board.new
+    board.initialize_positions
+    player = board.moves_so_far("player")
+    enemy = board.moves_so_far("computer")
+    assert_equal 0, player
+    assert_equal 0, enemy
+    board.update_player_map("A1")
+    board.update_enemy_map("A1", false)
+    player = board.moves_so_far("player")
+    enemy = board.moves_so_far("computer")
+    assert_equal 1, player
+    assert_equal 1, enemy
+  end
+
+  def test_it_can_count_remaining_critical_hits_for_player_to_win
+    board = Board.new
+    board.initialize_positions
+    board.anchor_ship(["A1", "A2"])
+    board.anchor_ship(["B1", "B2", "B3"])
+    moves = board.player_moves_to_win
+    assert_equal 5, moves
+    board.update_enemy_map("A1", true)
+    board.update_enemy_map("A2", true)
+    moves = board.player_moves_to_win
+    assert_equal 3, moves
+  end
+
+  def test_it_can_count_remaining_critical_hits_for_enemy_to_win
+    board = Board.new
+    board.initialize_positions
+    board.anchor_ship(["A1", "A2"])
+    board.anchor_ship(["B1", "B2", "B3"])
+    moves = board.enemy_moves_to_win
+    assert_equal 5, moves
+    board.update_player_map("A1")
+    board.update_player_map("A2")
+    moves = board.enemy_moves_to_win
+    assert_equal 3, moves
+  end
+
+  def test_it_can_count_remaining_targets
+    board = Board.new
+    board.initialize_positions
+    board.anchor_ship(["A1", "A2"])
+    board.anchor_ship(["B1", "B2", "B3"])
+    player_moves = board.remaining_targets(:player_map)
+    enemy_moves = board.remaining_targets(:enemy_map)
+    assert_equal 5, player_moves
+    assert_equal 5, enemy_moves
+    board.update_player_map("A1")
+    board.update_player_map("A2")
+    player_moves = board.remaining_targets(:player_map)
+    assert_equal 3, player_moves
+    board.update_enemy_map("A2", true)
+    enemy_moves = board.remaining_targets(:enemy_map)
+    assert_equal 4, enemy_moves
+  end
+
+  def test_it_can_get_all_hit_positions
+    board = Board.new
+    board.initialize_positions
+    board.anchor_ship(["A1", "A2"])
+    board.anchor_ship(["B1", "B2", "B3"])
+    board.update_player_map("A1")
+    board.update_player_map("A2")
+    player_hash = board.critically_hit(:player_map)
+    assert_instance_of Hash, player_hash
+    assert_equal 2, player_hash.count
+    assert_equal [:A1, :A2], player_hash.keys
+
+    board.update_enemy_map("A2", true)
+    enemy_hash = board.critically_hit(:enemy_map)
+    assert_equal 1, enemy_hash.count
+    assert_equal [:A2], enemy_hash.keys
+  end
+
+  def testi_it_can_get_all_player_ships
+    board = Board.new
+    board.initialize_positions
+    board.anchor_ship(["A1", "A2"])
+    board.anchor_ship(["B1", "B2", "B3"])
+    player_hash = board.find_all_player_ship_coordinates
+    assert_instance_of Hash, player_hash
+    assert_equal 5, player_hash.count
+    assert_equal [:A1, :A2, :B1, :B2, :B3], player_hash.keys
+  end
 end

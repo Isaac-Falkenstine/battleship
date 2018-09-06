@@ -146,4 +146,40 @@ class Board
     print "\n" + frame + string + frame
     return string
   end
+
+  def moves_so_far(winner)
+    # is this SILLY ??
+    #   you can just get directly from the winning player object, the view you want
+    # Player's map shows enemy hits / Enemy's map shows player hits
+    winner = "player" ? map_sym = :enemy_map : map_sym = :player_map
+    @positions.count {|key, val|
+      @positions[key][map_sym][:shot] == true
+    }
+  end
+
+  def player_moves_to_win
+    remaining_targets(:enemy_map)
+  end
+
+  def enemy_moves_to_win
+    remaining_targets(:player_map)
+  end
+
+  def remaining_targets(map_sym)
+    total = find_all_player_ship_coordinates.count
+    hits = critically_hit(map_sym).count
+    remaining = total - hits
+  end
+
+  def critically_hit(map_sym)
+    @positions.find_all {|key, val|
+      @positions[key][map_sym][:hit] == true
+    }.to_h
+  end
+
+  def find_all_player_ship_coordinates
+    @positions.find_all {|key, val|
+      @positions[key][:player_map][:ship] != nil
+    }.to_h
+  end
 end
