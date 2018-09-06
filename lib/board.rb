@@ -15,4 +15,19 @@ class Board
   def columns
     (1..@size).to_a
   end
+  def create_positions
+    pos = self.columns.map { |num|
+      self.rows.map { |char| [char, num].join }
+    }.flatten.sort
+    return pos
+  end
+
+  def initialize_positions
+    create_positions.each {|pos|
+      @positions[pos.to_sym] = {
+        :player_map => {shot: false, hit: false, ship: nil},
+        :enemy_map  => {shot: false, hit: false}
+      }
+    }
+  end
 end
