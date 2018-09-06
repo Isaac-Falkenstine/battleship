@@ -29,7 +29,19 @@ class PlayerTest < Minitest::Test
     assert_equal 16, p1.board.positions.count
   end
 
-  def test_it_can_place_all_ships
-    skip
+  def test_it_can_process_input_coordinates
+    human = Player.new(true)
+    arr = human.process_coordinates("A1 A2")
+    assert_equal ["A1", "A2"], arr
+  end
+
+  def test_it_can_do_a_random_shot
+    pc = Player.new(false)
+    pc.start_game
+    coord = pc.random_shot
+    positions = pc.board.positions.keys
+    actual = positions.include?(coord)
+    assert_equal true, actual
+    assert_equal 1, [coord].flatten.count
   end
 end
