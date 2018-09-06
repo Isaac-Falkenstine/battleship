@@ -1,3 +1,5 @@
+require 'simplecov'
+SimpleCov.start
 require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/board'
@@ -192,7 +194,7 @@ class BoardTest < Minitest::Test
     board.initialize_positions
 
     board.anchor_ship(["A1", "A2"])
-    board.update_player_map("A1")  
+    board.update_player_map("A1")
     board.update_player_map("B1")
 
     positions = board.positions

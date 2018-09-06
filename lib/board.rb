@@ -1,5 +1,5 @@
 class Board
-
+  
   attr_reader :size, :positions
 
   def initialize(size = 4)
@@ -54,8 +54,6 @@ class Board
     position[:shot] = true
     position[:hit] = true if success
   end
-  # TO DO --- ADD successful_hit method
-    # player or board???
 
   def possible_positions(width)
     arr = prevent_overlap
@@ -148,9 +146,6 @@ class Board
   end
 
   def moves_so_far(winner)
-    # is this SILLY ??
-    #   you can just get directly from the winning player object, the view you want
-    # Player's map shows enemy hits / Enemy's map shows player hits
     winner = "player" ? map_sym = :enemy_map : map_sym = :player_map
     @positions.count {|key, val|
       @positions[key][map_sym][:shot] == true
